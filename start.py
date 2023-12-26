@@ -5,6 +5,7 @@ import time
 
 from dotenv import load_dotenv
 from telegram import Bot, TelegramError
+from telegram.ext import Updater, Filters, MessageHandler
 from http import HTTPStatus
 
 from exceptions import APIErrorException, TelegramSendError
@@ -15,7 +16,7 @@ load_dotenv()
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
-RETRY_TIME = 600
+RETRY_TIME = 00
 ENDPOINT = 'https://api.mexc.com/api/v3/'
 HEADERS = {'Authorization': f'OAuth 77777777777'}
 START_TIME = 1660900000
@@ -122,6 +123,11 @@ def inform_user(bot, bot_instructions):
         logging.error(bot_instructions['current_message'])
 
 
+def say_hi(update, context):
+    chat = update.effective_chat
+    context.bot.send_message(chat_id=chat.id, text='RRrrrrrrrrr')
+
+
 def main():
     """Основная логика работы бота."""
     if not check_tokens():
@@ -129,6 +135,19 @@ def main():
         exit()
 
     bot = Bot(token=TELEGRAM_TOKEN)
+    updater = Updater(token=TELEGRAM_TOKEN)
+
+    text = 'Test'
+    bot.send_message(TELEGRAM_CHAT_ID, text)
+
+    updater.dispatcher.add_handler(MessageHandler(Filters.text, say_hi))
+    updater.start_polling()
+    updater.idle()
+
+    exit()
+    # telegram.error.Unauthorized: Forbidden: bot was blocked by the user
+    # telegram.error.BadRequest: Chat not found
+
     current_timestamp = START_TIME
 
     # instructions for the bot to send specific messages
