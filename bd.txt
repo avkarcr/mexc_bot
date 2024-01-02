@@ -1,0 +1,8 @@
+2024-01-02 23:57:34, USDT, not specified
+2024-01-02 23:57:34, CGROK, not specified
+2024-01-02 23:57:34, BNB, not specified
+2024-01-02 23:57:34, AVAX, not specified
+2024-01-02 23:57:34, ECC, not specified
+2024-01-02 23:57:34, MX, not specified
+2024-01-02 23:57:34, REX, not specified
+2024-01-02 23:57:34, MATH, not specified

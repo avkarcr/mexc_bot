@@ -1,3 +1,64 @@
+# class TokensSaleTime(Base):
+#     __tablename__ = 'token_sale_time'
+#     id = Column(Integer, primary_key=True)
+#     name = Column(String)
+#     sale_time = Column(DateTime)
+#
+# engine = create_engine('sqlite:///token_sale_time.db')
+# Base.metadata.create.all(engine)
+# Session = sessionmaker(bind=engine)
+
+# def trade_asset_market(mexc_trade, mexc_account, symbol, side):
+#     if side == 'BUY':
+#         params = {
+#             'symbol': symbol + 'USDT',
+#             'side': side,
+#             'type': 'MARKET',
+#             'quoteOrderQty': 6,
+#             'quantity': 6,
+#         }
+#     else:
+#         qty = get_balance(mexc_account, symbol)
+#         params = {
+#             'symbol': symbol + 'USDT',
+#             'side': side,
+#             'type': 'MARKET',
+#             'quoteOrderQty': qty,
+#             'quantity': qty,
+#         }
+#     return mexc_trade.post_order(params)
+
+    # moscow_tz = pytz.timezone('Europe/Moscow')
+    # target_time = "01:03:00"
+    #
+    # while True:
+    #     count += 1
+    #     now = datetime.datetime.now(moscow_tz).strftime('%H:%M:%S')
+    #     print('---------------------------------')
+    #     print(f'{now}: Cycle {count % 5}')
+    #     if count % 2 == 0:
+    #         print('Updating balances...')
+    #         mexc.check_balance_changes()
+    #
+    #     time.sleep(5)
+
+    # trade_asset_market(mexc_trade, mexc_account, dust_asset, 'BUY')
+    # time.sleep(1)
+    # trade_asset_market(mexc_trade, mexc_account, dust_asset, 'SELL')
+
+    # if dust_asset in assets:
+    #     params = {'asset': dust_asset}
+    #     capital = mexc_toolkit.mexc_capital(mexc_host, api_key, secret_key)
+    #     # resp = capital.post_smallAssets_convert(params=params)
+    #     resp = capital.get_smallAssets_list()
+    #     for item in resp:
+    #         asset = item.get('asset')
+    #         balance = item.get('balance')
+    #         msg = item.get('message')
+    #         print(f'Asset {asset}: Balance: {balance}. Message: {msg}')
+
+
+
 import logging
 import os
 import requests
@@ -184,7 +245,4 @@ def main():
 
         time.sleep(RETRY_TIME)
 
-
-if __name__ == '__main__':
-    main()
 
