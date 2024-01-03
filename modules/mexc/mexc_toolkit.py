@@ -245,7 +245,7 @@ class mexc_account(TOOL):
         self.mexc_key = mexc_key
         self.mexc_secret = mexc_secret
 
-    def get_account_info(self):
+    async def get_account_info(self):
         """get account information"""
         method = 'GET'
         url = '{}{}'.format(self.api, '/account')

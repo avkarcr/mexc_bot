@@ -2,6 +2,7 @@ logs.txt
 Dockerfile
 bd.txt
 .idea/
+snippets.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
