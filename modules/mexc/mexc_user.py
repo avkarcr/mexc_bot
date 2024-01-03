@@ -1,3 +1,4 @@
+import asyncio
 import time
 import datetime as dt
 from loguru import logger
@@ -13,32 +14,6 @@ class MexcAccount(TOOL):
         self.tokens_to_sell = []
         self.tokens_on_hold = tokens_on_hold
 
-    async def initial_balance(self):
-        count = 0
-        while True:
-            try:
-                count += 1
-                account = await self.mexc_account.get_account_info()
-                self.current_balance = account['balances']
-                all_tokens = [item['asset'] for item in self.current_balance]
-                self.tokens_to_sell = [_ for _ in all_tokens if _ not in self.tokens_on_hold]
-                break
-            except KeyError as exception:
-                logger.warning(f'There are issues gettings balances: {exception}')
-                # print(f'KeyError: {self.mexc_account.get_account_info()}')
-            finally:
-                time.sleep(1)
-                if count % 10 == 0:
-                    msg = 'Trying 10 times getting account info. No result!'
-                    logger.error(msg)
-                    exit()
-        with open('bd.txt', 'w') as file:
-            record_time = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            for asset in self.current_balance:
-                token = asset['asset']
-                trade_start_time = 'not specified'
-                file.write(f'{record_time}, {token}, {trade_start_time}\n')
-
     @async_retry(10, 1)
     async def update_balance(self):
         while True:
@@ -48,8 +23,8 @@ class MexcAccount(TOOL):
                 all_tokens = [item['asset'] for item in self.current_balance]
                 self.tokens_to_sell = [_ for _ in all_tokens if _ not in self.tokens_on_hold]
                 return
-            except KeyError as exception:
-                logger.warning(f'There are issues gettings balances: {exception}')
+            except KeyError:
+                logger.warning(f'Error in key \'balances\'. Account_info: {account}')
 
     async def get_balance(self):
-        return str(self.current_balance)
+        return self.current_balance

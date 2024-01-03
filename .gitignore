@@ -3,6 +3,7 @@ Dockerfile
 bd.txt
 .idea/
 snippets.py
+tokens.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
