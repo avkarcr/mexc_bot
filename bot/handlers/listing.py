@@ -2,16 +2,16 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
-start_router = Router()
+listing_router = Router()
 
 
-@start_router.message(Command("start"))
-async def command_start_handler(message: Message) -> None:
+@listing_router.message(Command("listing"))
+async def command_listing_handler(message: Message) -> None:
     """
-    This handler receives messages with `/start` command
+    This handler receives messages with `/listing` command
     """
-    await message.answer('⏳')
-    mexc = start_router.parent_router.mexc
+    # await message.answer('⏳')
+    mexc = listing_router.parent_router.mexc
     await mexc.update_balance()
     balance = next((item['free'] for item in mexc.current_balance if item['asset'] == 'USDT'), None)
     tokens_to_sell = '\n'.join(_ for _ in mexc.tokens_to_sell)

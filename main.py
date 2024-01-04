@@ -19,7 +19,7 @@ async def start():
     if environ[0]:
         logger.critical(f'Failed to get ENV: {environ[1]}')
         exit()
-    logger.success('ENVs has been successfully loaded')
+    logger.debug('ENVs has been successfully loaded')
     environ = environ[1]
 
     telebot = TeleBot(

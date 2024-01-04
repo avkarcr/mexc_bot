@@ -12,6 +12,7 @@ from bot.handlers.start import start_router
 from modules.database.db_sqlite import (
     add_new_tokens_to_db,
     get_tokens_list,
+    remove_from_db,
 )
 
 
@@ -26,7 +27,28 @@ class TeleBot():
         )
         self.dp.mexc = None
 
-    async def get_balance(self):
+    async def sync_database(self, set_real: set, set_stored_in_db: set) -> None:
+        f_name = inspect.currentframe().f_code.co_name
+        logger.debug(f'START {f_name}()')
+        added = [
+            set_real - set_stored_in_db,
+            '<b>NEW token(s): </b>',
+            add_new_tokens_to_db,
+        ]
+        removed = [
+            set_stored_in_db - set_real,
+            '<b>Token(s) removed: </b>',
+            remove_from_db,
+        ]
+        for status in [added, removed]:
+            if status[0]:
+                status[1] += f'{", ".join(status[0])}'
+                await status[2](status[0])
+                logger.success(f'Данные в базе данных обновлены по токенам: {status[0]}')
+                await self.bot.send_message(self.admin_id, text=status[1])
+        logger.debug(f'FINISH {f_name}()')
+
+    async def get_balance(self):  # todo удалить задвоение функции
         f_name = inspect.currentframe().f_code.co_name
         logger.debug(f'START {f_name}()')
         balance = await self.dp.mexc.get_balance()
@@ -39,22 +61,17 @@ class TeleBot():
         await self.dp.mexc.update_balance()
         balance = await self.dp.mexc.get_balance()
         new_tokens = [item['asset'] for item in balance]
-        add_new_tokens_to_db(new_tokens, self.dp.mexc.tokens_on_hold)
+        await add_new_tokens_to_db(new_tokens, self.dp.mexc.tokens_on_hold)
         logger.debug(f'FINISH {f_name}()')
 
     async def check_new_tokens(self):
         f_name = inspect.currentframe().f_code.co_name
         logger.debug(f'START {f_name}()')
         await self.dp.mexc.update_balance()
-        tokens_from_db = await get_tokens_list()
-        added_tokens = set(self.dp.mexc.tokens_to_sell) - set(tokens_from_db)
-        if added_tokens:  # TODO если список 2 меньше, значит надо токен удалить из БД
-            add_new_tokens_to_db(added_tokens)
-            if len(added_tokens) == 1:
-                msg = f'<b>NEW TOKEN: {list(added_tokens)[0]}</b>'
-            else:
-                msg = f'<b>NEW TOKENS: {", ".join(added_tokens)}</b>'
-            await self.bot.send_message(self.admin_id, text=msg)
+        await self.sync_database(
+            set(self.dp.mexc.tokens_to_sell),
+            set(await get_tokens_list()),
+        )
         logger.debug(f'FINISH {f_name}()')
 
     async def edit_last_bot_msg(self):
@@ -64,6 +81,7 @@ class TeleBot():
         await self.create_db()
         scheduler = AsyncIOScheduler({'apscheduler.timezone': 'Europe/Moscow'})
         scheduler.add_job(self.check_new_tokens, 'interval', seconds=30) #, misfire_grace_time=120)
+        scheduler.add_job(self.convert_to_mx, 'cron', hour=15, misfire_grace_time=120)
         scheduler.start()
         try:
             await self.bot.send_message(self.admin_id, text='Bot is working...')
