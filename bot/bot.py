@@ -9,6 +9,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from bot.handlers.messages import msg_router
 from bot.handlers.start import start_router
+from bot.handlers.listing import listing_router  # todo сделать в одном handler
 from modules.database.db_sqlite import (
     add_new_tokens_to_db,
     get_tokens_list,
@@ -23,6 +24,7 @@ class TeleBot():
         self.dp = Dispatcher()
         self.dp.include_routers(
             start_router,
+            listing_router,
             msg_router,
         )
         self.dp.mexc = None
@@ -47,13 +49,6 @@ class TeleBot():
                 logger.success(f'Данные в базе данных обновлены по токенам: {status[0]}')
                 await self.bot.send_message(self.admin_id, text=status[1])
         logger.debug(f'FINISH {f_name}()')
-
-    async def get_balance(self):  # todo удалить задвоение функции
-        f_name = inspect.currentframe().f_code.co_name
-        logger.debug(f'START {f_name}()')
-        balance = await self.dp.mexc.get_balance()
-        logger.debug(f'FINISH {f_name}()')
-        return balance
 
     async def create_db(self):
         f_name = inspect.currentframe().f_code.co_name
@@ -81,7 +76,7 @@ class TeleBot():
         await self.create_db()
         scheduler = AsyncIOScheduler({'apscheduler.timezone': 'Europe/Moscow'})
         scheduler.add_job(self.check_new_tokens, 'interval', seconds=30) #, misfire_grace_time=120)
-        scheduler.add_job(self.convert_to_mx, 'cron', hour=15, misfire_grace_time=120)
+        # scheduler.add_job(self.convert_to_mx, 'cron', hour=15, misfire_grace_time=120)
         scheduler.start()
         try:
             await self.bot.send_message(self.admin_id, text='Bot is working...')
