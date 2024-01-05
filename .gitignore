@@ -1,9 +1,7 @@
 logs.txt
-Dockerfile
 bd.txt
 snippets.py
 tokens.db
-.dockerignore
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

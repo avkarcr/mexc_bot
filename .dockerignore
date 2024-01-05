@@ -1,0 +1,9 @@
+.env
+.git/
+.gitignore
+.idea/
+venv/
+tokens.db
+snippets.py
+logs.txt
+**/__pycache__
