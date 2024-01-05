@@ -78,7 +78,7 @@ class TeleBot():
     async def start(self) -> None:
         await self.create_db()
         scheduler = AsyncIOScheduler({'apscheduler.timezone': 'Europe/Moscow'})
-        scheduler.add_job(self.check_new_tokens, 'interval', seconds=30) #, misfire_grace_time=120)
+        scheduler.add_job(self.check_new_tokens, 'interval', minutes=30, misfire_grace_time=120)
         # scheduler.add_job(self.convert_to_mx, 'cron', hour=15, misfire_grace_time=120)
         scheduler.start()
         try:
