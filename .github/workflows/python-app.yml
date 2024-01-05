@@ -43,7 +43,7 @@ jobs:
         push: true
         tags: avkarcr/mexc_bot:latest
         secrets: |
-          ADMIN_ID=${{ secrets.ADMIN_ID }}
+          "ADMIN_ID=${{ secrets.ADMIN_ID }}"
 
   deploy:
       runs-on: ubuntu-latest
