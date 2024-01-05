@@ -1,4 +1,5 @@
 import asyncio
+import os
 import sys
 
 from dotenv import load_dotenv
@@ -34,4 +35,6 @@ async def start():
     await telebot.start()
 
 if __name__ == '__main__':
+    id = os.getenv('ADMIN_ID')
+    logger.critical(f'ID: {id}')
     asyncio.run(start())

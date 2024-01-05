@@ -19,8 +19,6 @@ async def get_environments() -> dict:
     environ = {}
     result = (False, environ)
     for var_name, (env_name, _) in envs.items():
-        logger.critical(f'var_name: {var_name}')  # todo DEL
-        logger.critical(f'env_name: {env_name}')  # todo DEL
         environ[var_name] = os.getenv(env_name)
         # if _ is list:
         #     try:
