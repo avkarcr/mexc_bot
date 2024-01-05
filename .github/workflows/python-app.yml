@@ -42,7 +42,7 @@ jobs:
       with:
         push: true
         tags: avkarcr/mexc_bot:latest
-        secrets:
+        secrets: |
           ADMIN_ID=${{ secrets.ADMIN_ID }}
 
   deploy:
