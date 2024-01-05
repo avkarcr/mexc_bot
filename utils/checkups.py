@@ -1,9 +1,9 @@
+from loguru import logger  # todo DEL
+
 import os
 import re
 import json
 import datetime as dt
-
-from loguru import logger  ## todo DELETE
 
 from config import MEXC_HOST, TOKENS_ON_HOLD
 
@@ -19,9 +19,8 @@ async def get_environments() -> dict:
     environ = {}
     result = (False, environ)
     for var_name, (env_name, _) in envs.items():
+        logger.critical('TEST')
         environ[var_name] = os.getenv(env_name)
-        logger.info(f'var_name = {var_name}')  # todo DEL
-        logger.info(f'env_name = {env_name}')  # todo DEL
         # if _ is list:
         #     try:
         #         environ[var_name] = json.loads(environ[var_name].replace("'", '"'))
