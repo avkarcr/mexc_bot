@@ -360,7 +360,7 @@ class mexc_capital(TOOL):
         response = self.sign_request(method, url)
         return response.json()
 
-    def post_smallAssets_convert(self, params):
+    def post_smallAssets_convert(self, params):  # todo make async
         """small Assets convert"""
         method = 'POST'
         url = '{}{}'.format(self.api, '/convert')

@@ -32,22 +32,25 @@ class TeleBot():
     async def sync_database(self, set_real: set, set_stored_in_db: set) -> None:
         f_name = inspect.currentframe().f_code.co_name
         logger.debug(f'START {f_name}()')
-        added = [
+        added = [  # todo needs improvement
             set_real - set_stored_in_db,
             '<b>NEW token(s): </b>',
             add_new_tokens_to_db,
+            True,  # информировать в телеге
         ]
         removed = [
             set_stored_in_db - set_real,
             '<b>Token(s) removed: </b>',
             remove_from_db,
+            False,
         ]
         for status in [added, removed]:
             if status[0]:
                 status[1] += f'{", ".join(status[0])}'
                 await status[2](status[0])
                 logger.success(f'Данные в базе данных обновлены по токенам: {status[0]}')
-                await self.bot.send_message(self.admin_id, text=status[1])
+                if status[3]:
+                    await self.bot.send_message(self.admin_id, text=status[1])
         logger.debug(f'FINISH {f_name}()')
 
     async def create_db(self):
