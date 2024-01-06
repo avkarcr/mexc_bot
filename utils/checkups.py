@@ -31,7 +31,7 @@ async def get_environments() -> dict:
             try:
                 environ[var_name] = int(environ[var_name])
             except (ValueError, TypeError):
-                result = (True, f"Environment variable {environ[var_name]} should be an integer!")
+                result = (True, f"Environment {environ[env_name]} variable {environ[var_name]} should be an integer!")
     try:
         environ['tokens_on_hold'] = json.loads(str(TOKENS_ON_HOLD).replace("'", '"'))
     except (json.JSONDecodeError, TypeError):
