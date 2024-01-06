@@ -57,7 +57,7 @@ jobs:
               sudo docker stop mexc_bot || true
               sudo docker rm mexc_bot || true
               sudo docker pull avkarcr/mexc_bot:latest
-              sudo docker run -d --name mexc_bot avkarcr/mexc_bot:latest
+              sudo docker run -d --name mexc_bot --env-file ~/mexc_bot/.env avkarcr/mexc_bot:latest
               sudo docker image prune -a -f
 #              sudo docker images | grep mexc | awk '{print $3}' | xargs -r docker run -d --env-file ~/mexc_bot/.env
 #              sudo docker images | grep mexc | grep latest | awk '{print $3}' | xargs -r docker run -d --env-file ~/mexc_bot/.env
