@@ -14,7 +14,7 @@ async def start():
     load_dotenv()
     logger.remove()
     logger.add(sys.stderr, format="{time} {level} {message}", level="WARNING")
-    logger.add("logs.txt", rotation="50 MB", retention="1 week", level="DEBUG")
+    logger.add("DB/logs.txt", rotation="50 MB", retention="1 week", level="DEBUG")
     environ = await get_environments()
     if environ[0]:
         logger.critical(f'Failed to get ENV: {environ[1]}')

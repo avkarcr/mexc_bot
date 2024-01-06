@@ -20,7 +20,7 @@ class Token(Base):
     trade_start_time = Column(DateTime)
     status = Column(String)
 
-engine = create_engine('sqlite:///tokens.db')
+engine = create_engine('sqlite:///DB/tokens.db')
 if DROP_DB_ON_START:
     Base.metadata.drop_all(engine)
 Base.metadata.create_all(engine)
