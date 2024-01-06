@@ -45,7 +45,9 @@ jobs:
         tags: avkarcr/mexc_bot:latest
         build-args: |
           ADMIN_ID=${{ secrets.ADMIN_ID }}
-          TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}
+#          TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}
+#          MEXC_API=${{ secrets.MEXC_API }}
+#          MEXC_SECRET_KEY=${{ secrets.MEXC_SECRET_KEY }}
 
   deploy:
       runs-on: ubuntu-latest

@@ -5,7 +5,4 @@ RUN pip install -r /app/requirements.txt --no-cache-dir
 COPY . /app
 WORKDIR /app
 ARG ADMIN_ID
-ARG TELEGRAM_TOKEN
-ENV ADMIN_ID=$ADMIN_ID
-ENV TELEGRAM_TOKEN=$TELEGRAM_TOKEN
 CMD ["python", "main.py"]
