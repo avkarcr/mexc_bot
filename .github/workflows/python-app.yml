@@ -40,14 +40,8 @@ jobs:
     - name: docker build push
       uses: docker/build-push-action@v5
       with:
-        context: .
         push: true
         tags: avkarcr/mexc_bot:latest
-        build-args: |
-          ADMIN_ID=${{ secrets.ADMIN_ID }}
-#          TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}
-#          MEXC_API=${{ secrets.MEXC_API }}
-#          MEXC_SECRET_KEY=${{ secrets.MEXC_SECRET_KEY }}
 
   deploy:
       runs-on: ubuntu-latest
@@ -60,6 +54,12 @@ jobs:
             username: ${{ secrets.CLOUD_USER }}
             key: ${{ secrets.CLOUD_SSH_KEY }}
             script: |
+              sudo docker stop mexc_bot || true
+              sudo docker rm mexc_bot || true
               sudo docker pull avkarcr/mexc_bot:latest
-              sudo docker ps -a | grep mexc | grep -oE "^[0-9a-zA-Z]+" | xargs -r sudo docker stop
-              sudo docker run --rm -d avkarcr/mexc_bot:latest
+              sudo docker run -d --name mexc_bot avkarcr/mexc_bot:latest
+              sudo docker image prune -a -f
+#              sudo docker images | grep mexc | awk '{print $3}' | xargs -r docker run -d --env-file ~/mexc_bot/.env
+#              sudo docker images | grep mexc | grep latest | awk '{print $3}' | xargs -r docker run -d --env-file ~/mexc_bot/.env
+#              sudo docker ps -a | grep mexc | grep -oE "^[0-9a-zA-Z]+" | xargs -r sudo docker stop
+#              sudo docker run --rm -d --name mexc_bot avkarcr/mexc_bot:latest

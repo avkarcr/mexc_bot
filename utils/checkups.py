@@ -1,5 +1,3 @@
-from loguru import logger  # todo DEL
-
 import os
 import re
 import json
@@ -37,8 +35,6 @@ async def get_environments() -> dict:
     except (json.JSONDecodeError, TypeError):
         result = (True, f"Variable (config.py) TOKENS_ON_HOLD should be a list!")
     environ['MEXC_HOST'] = MEXC_HOST
-    print(environ['token'][:5])  # todo DEL
-    print(environ['mexc_api'][:4])  # todo DEL
     return result
 
 def check_token(token_name):

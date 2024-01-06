@@ -1,4 +1,3 @@
-import datetime as dt
 import inspect
 
 from aiogram import Bot, Dispatcher
