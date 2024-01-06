@@ -12,6 +12,10 @@ from modules.mexc.mexc_user import MexcAccount
 
 async def start():
     load_dotenv()
+
+    id = os.getenv('ADMIN_ID')  # todo DEL
+    logger.critical(f'ID: {id}')
+
     logger.remove()
     logger.add(sys.stderr, format="{time} {level} {message}", level="WARNING")
     logger.add("logs.txt", rotation="50 MB", retention="1 week", level="DEBUG")
@@ -35,6 +39,4 @@ async def start():
     await telebot.start()
 
 if __name__ == '__main__':
-    id = os.getenv('ADMIN_ID')
-    logger.critical(f'ID: {id}')
     asyncio.run(start())
