@@ -40,9 +40,12 @@ jobs:
     - name: docker build push
       uses: docker/build-push-action@v5
       with:
+        context: .
         push: true
         tags: avkarcr/mexc_bot:latest
-        build-args: ADMIN_ID=${{ secrets.ADMIN_ID }}
+        build-args: |
+          ADMIN_ID=${{ secrets.ADMIN_ID }}
+          TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}
 
   deploy:
       runs-on: ubuntu-latest

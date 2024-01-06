@@ -25,13 +25,13 @@ async def get_environments() -> dict:
         #         environ[var_name] = json.loads(environ[var_name].replace("'", '"'))
         #     except (json.JSONDecodeError, TypeError):
         #         result = (True, f"Env variable {environ[var_name]} should be a list!")
-        # if _ is str and not environ[var_name]:
-        #     result = (True, f"Environment variable {environ[var_name]} should be a string!")
+        if _ is str and not environ[var_name]:
+            result = (True, f"Environment variable {environ[var_name]} should be a string!")
         if _ is int:
             try:
                 environ[var_name] = int(environ[var_name])
             except (ValueError, TypeError):
-                result = (True, f"Environment {environ[env_name]} variable {environ[var_name]} should be an integer!")
+                result = (True, f"Environment variable {environ[var_name]} should be an integer!")
     try:
         environ['tokens_on_hold'] = json.loads(str(TOKENS_ON_HOLD).replace("'", '"'))
     except (json.JSONDecodeError, TypeError):
