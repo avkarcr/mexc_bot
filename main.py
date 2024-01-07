@@ -1,13 +1,11 @@
 import asyncio
-import os
 import sys
 
 from dotenv import load_dotenv
 from loguru import logger
 
-from bot.bot import TeleBot
+from bot.bot import MegaBot
 from utils.checkups import get_environments
-from modules.mexc.mexc_user import MexcAccount
 
 
 async def start():
@@ -21,19 +19,24 @@ async def start():
         exit()
     logger.debug('ENVs has been successfully loaded')
     environ = environ[1]
-
-    telebot = TeleBot(
+    megabot = MegaBot(
         token=environ['token'],
         admin_id=environ['admin_id'],
         timing=environ['timing'],
+        db_set={
+            'db_url': environ['db_url'],
+            'drop_db_on_start': environ['drop_db_on_start'],
+            'user_id': environ['admin_id'],
+            'tokens_on_hold': environ['tokens_on_hold'],
+        },
+        mexc_set={
+            'mexc_host': environ['mexc_host'],
+            'api_key': environ['mexc_api'],
+            'secret_key': environ['mexc_secret_key'],
+            'tokens_on_hold': environ['tokens_on_hold'],
+        },
     )
-    telebot.dp.mexc = MexcAccount(
-        mexc_host = environ['MEXC_HOST'],
-        api_key = environ['mexc_api'],
-        secret_key = environ['mexc_secret_key'],
-        tokens_on_hold = environ['tokens_on_hold'],
-    )
-    await telebot.start()
+    await megabot.start()
 
 if __name__ == '__main__':
     asyncio.run(start())

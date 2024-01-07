@@ -5,8 +5,6 @@ from aiogram.filters import Command
 from aiogram.types import Message
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from modules.database.db_sqlite import set_listing_time
-from modules.mexc.mexc_user import MexcAccount
 from utils.checkups import (
     check_token,
     check_listing_time,
@@ -34,14 +32,15 @@ async def command_listing_handler(message: Message) -> None:
     """
     This handler receives messages with `/listing` command
     """
-    mexc = listing_router.parent_router.mexc
+    mexc = listing_router.megabot.mexc
+    db = listing_router.megabot.db
     args = message.text.split(maxsplit=1)
     if not check_args(args)[0]:
         await message.answer(check_args(args)[1])
         return
     token = args[1].split(maxsplit=1)[0]
     listing_time = convert_listing_time(args[1].split(maxsplit=1)[1])
-    await set_listing_time(token, listing_time)
+    await db.set_listing_time(token, listing_time)
     # todo Сделать функцию по листингу внутри класса бота, а отсюда только message туда прокидывать
     scheduler = AsyncIOScheduler({'apscheduler.timezone': 'Europe/Moscow'})  # todo working...
     scheduler.add_job(mexc.convert_to_mx, 'date', run_date=listing_time, args=[token])

@@ -3,6 +3,7 @@ name: Python application
 on: [push]
 
 env:
+  # Docker Hub image name syntax: username/project:label
   DOCKERHUB_PREFIX: "avkarcr"
   PROJECT_NAME: "mexc_bot"
   TAG: "latest"

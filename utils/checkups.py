@@ -3,39 +3,57 @@ import re
 import json
 import datetime as dt
 
-from config import MEXC_HOST, TOKENS_ON_HOLD, TIMING
+import config
+from config import (
+    TIMING,
+    MEXC_HOST,
+    TOKENS_ON_HOLD,
+    DROP_DB_ON_START,
+    DB_URL,
+)
 
 from utils.exceptions import DateTimeParseException
 
 async def get_environments() -> dict:
+    # Variable name: [ENVIRONMENT/CONFIG NAME, type, True|False - is in .env]
     envs = {
-        'token': ['TELEGRAM_TOKEN', str],
-        'admin_id': ['ADMIN_ID', int],
-        'mexc_api': ['MEXC_API', str],
-        'mexc_secret_key': ['MEXC_SECRET_KEY', str],
+        'token': ['TELEGRAM_TOKEN', str, True],
+        'admin_id': ['ADMIN_ID', int, True],
+        'mexc_api': ['MEXC_API', str, True],
+        'mexc_secret_key': ['MEXC_SECRET_KEY', str, True],
+        'user': ['USER', str, True],
+        'mexc_host': ['MEXC_HOST', str, False],
+        'db_url': ['DB_URL', str, False],
+        'drop_db_on_start': ['DROP_DB_ON_START', bool, False],
+        'timing': ['TIMING', dict, False],  # todo сделать проверку для словаря
+        'tokens_on_hold': ['TOKENS_ON_HOLD', list, False],
     }
     environ = {}
     result = (False, environ)
-    for var_name, (env_name, _) in envs.items():
-        environ[var_name] = os.getenv(env_name)
-        # if _ is list: # todo снять коменты и проверить на конфиге
-        #     try:
-        #         environ[var_name] = json.loads(environ[var_name].replace("'", '"'))
-        #     except (json.JSONDecodeError, TypeError):
-        #         result = (True, f"Env variable {environ[var_name]} should be a list!")
-        if _ is str and not environ[var_name]:
-            result = (True, f"Environment variable {environ[var_name]} should be a string!")
-        if _ is int:
+    for var_name, (env_name, _type, _is_env) in envs.items():
+        if _is_env:
+            environ[var_name] = os.getenv(env_name)
+        else:
+            environ[var_name] = getattr(config, env_name)
+        if _type is int:
             try:
                 environ[var_name] = int(environ[var_name])
             except (ValueError, TypeError):
                 result = (True, f"Environment variable {environ[var_name]} should be an integer!")
-    try:
-        environ['tokens_on_hold'] = json.loads(str(TOKENS_ON_HOLD).replace("'", '"'))
-    except (json.JSONDecodeError, TypeError):
-        result = (True, f"Variable (config.py) TOKENS_ON_HOLD should be a list!")
-    environ['MEXC_HOST'] = MEXC_HOST
-    environ['timing'] = TIMING  # todo сделать так, чтобы переменные из конфига тоже проверялись
+        else:
+            if not isinstance(environ[var_name], _type):
+                result = (True, f"Variable {environ[var_name]} should be a {_type} type.")
+        # if _type is list:  # todo нужен тест
+        #     try:
+        #         environ[var_name] = json.loads(environ[var_name].replace("'", '"'))
+        #     except (json.JSONDecodeError, TypeError):
+        #         result = (True, f"Env variable {environ[var_name]} should be a list!")
+        # if _type is str and not environ[var_name]:
+        #     result = (True, f"Environment variable {environ[var_name]} should be a string!")
+        # if _type is bool and not environ[var_name]:  # todo сделать проверку на булево значение
+        #     is_non_empty = variable is not None and variable != ""
+        #     is_boolean = isinstance(variable, bool)
+        #     result = (True, f"Environment variable {environ[var_name]} should be a string!")
     return result
 
 def check_token(token_name):

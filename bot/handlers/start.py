@@ -10,8 +10,8 @@ async def command_start_handler(message: Message) -> None:
     """
     This handler receives messages with `/start` command
     """
-    await message.answer('⏳')
-    mexc = start_router.parent_router.mexc
+    # await message.answer('⏳')
+    mexc = start_router.megabot.mexc
     await mexc.update_balance()
     balance = next((item['free'] for item in mexc.current_balance if item['asset'] == 'USDT'), None)
     tokens_to_sell = '\n'.join(_ for _ in mexc.tokens_to_sell)
