@@ -5,6 +5,7 @@ on: [push]
 env:
   DOCKERHUB_PREFIX: "avkarcr"
   PROJECT_NAME: "mexc_bot"
+  TAG: "latest"
 
 jobs:
   tests:
@@ -45,7 +46,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         push: true
-        tags: ${{ env.DOCKERHUB_PREFIX }}/${{ env.PROJECT_NAME }}:latest
+        tags: ${{ env.DOCKERHUB_PREFIX }}/${{ env.PROJECT_NAME }}:${{ env.TAG }}
 
   deploy:
       runs-on: ubuntu-latest
@@ -59,7 +60,6 @@ jobs:
             key: ${{ secrets.CLOUD_SSH_KEY }}
             script: |
               sudo docker ps -a | grep ${{ env.PROJECT_NAME }} | grep -oE "^[0-9a-zA-Z]+" | xargs -r -I {} sh -c 'docker stop {} && docker rm {}'
-              sudo docker ps -a | grep ${{ env.PROJECT_NAME }} | grep -oE "^[0-9a-zA-Z]+" | xargs -r -I {} sh -c 'docker stop {} && docker rm {}'
               sudo docker images | grep ${{ env.PROJECT_NAME }} | awk '{print $3}' | xargs -r docker rmi
-              sudo docker pull ${{ env.DOCKERHUB_PREFIX }}/${{ env.PROJECT_NAME }}:latest
-              sudo docker run -d -v ~/${{ env.PROJECT_NAME }}/db:/app/DB --name ${{ env.PROJECT_NAME }} --env-file ~/${{ env.PROJECT_NAME }}/.env ${{ env.DOCKERHUB_PREFIX }}/${{ env.PROJECT_NAME }}:latest
+              sudo docker pull ${{ env.DOCKERHUB_PREFIX }}/${{ env.PROJECT_NAME }}:${{ env.TAG }}
+              sudo docker run -d -v ~/${{ env.PROJECT_NAME }}/DB:/app/DB --name ${{ env.PROJECT_NAME }} --env-file ~/${{ env.PROJECT_NAME }}/.env ${{ env.DOCKERHUB_PREFIX }}/${{ env.PROJECT_NAME }}:${{ env.TAG }}
