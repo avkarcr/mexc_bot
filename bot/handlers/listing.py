@@ -42,7 +42,7 @@ async def command_listing_handler(message: Message) -> None:
     token = args[1].split(maxsplit=1)[0]
     listing_time = convert_listing_time(args[1].split(maxsplit=1)[1])
     await set_listing_time(token, listing_time)
-
+    # todo Сделать функцию по листингу внутри класса бота, а отсюда только message туда прокидывать
     scheduler = AsyncIOScheduler({'apscheduler.timezone': 'Europe/Moscow'})  # todo working...
     scheduler.add_job(mexc.convert_to_mx, 'date', run_date=listing_time, args=[token])
     scheduler.start()

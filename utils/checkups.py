@@ -3,7 +3,7 @@ import re
 import json
 import datetime as dt
 
-from config import MEXC_HOST, TOKENS_ON_HOLD
+from config import MEXC_HOST, TOKENS_ON_HOLD, TIMING
 
 from utils.exceptions import DateTimeParseException
 
@@ -35,6 +35,7 @@ async def get_environments() -> dict:
     except (json.JSONDecodeError, TypeError):
         result = (True, f"Variable (config.py) TOKENS_ON_HOLD should be a list!")
     environ['MEXC_HOST'] = MEXC_HOST
+    environ['timing'] = TIMING
     return result
 
 def check_token(token_name):

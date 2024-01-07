@@ -59,7 +59,3 @@ jobs:
               sudo docker pull avkarcr/mexc_bot:latest
               sudo docker run -d -v ~/mexc_bot/db:/app/DB --name mexc_bot --env-file ~/mexc_bot/.env avkarcr/mexc_bot:latest
               sudo docker image prune -a -f
-#              sudo docker images | grep mexc | awk '{print $3}' | xargs -r docker run -d --env-file ~/mexc_bot/.env
-#              sudo docker images | grep mexc | grep latest | awk '{print $3}' | xargs -r docker run -d --env-file ~/mexc_bot/.env
-#              sudo docker ps -a | grep mexc | grep -oE "^[0-9a-zA-Z]+" | xargs -r sudo docker stop
-#              sudo docker run --rm -d --name mexc_bot avkarcr/mexc_bot:latest

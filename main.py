@@ -25,6 +25,7 @@ async def start():
     telebot = TeleBot(
         token=environ['token'],
         admin_id=environ['admin_id'],
+        timing=environ['timing'],
     )
     telebot.dp.mexc = MexcAccount(
         mexc_host = environ['MEXC_HOST'],

@@ -1,4 +1,6 @@
+import asyncio
 import inspect
+import datetime as dt
 
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
@@ -17,9 +19,10 @@ from modules.database.db_sqlite import (
 
 
 class TeleBot():
-    def __init__(self, token, admin_id):
+    def __init__(self, token, admin_id, timing):
         self.bot = Bot(token=token, parse_mode=ParseMode.HTML)
         self.admin_id = admin_id
+        self.timing = timing
         self.dp = Dispatcher()
         self.dp.include_routers(
             start_router,
@@ -71,6 +74,12 @@ class TeleBot():
         )
         logger.debug(f'FINISH {f_name}()')
 
+    async def start_trading_cycle(self):
+        now = dt.datetime.now()
+        while dt.datetime.now() < now + self.timing['spot']:
+            await self.bot.send_message(self.admin_id, text='Делаем что-то')
+            asyncio.sleep(self.timing['delay'])
+
     async def edit_last_bot_msg(self):
         pass
 
@@ -82,6 +91,9 @@ class TeleBot():
         scheduler.start()
         try:
             await self.bot.send_message(self.admin_id, text='Bot is working...')
+
+            await self.start_trading_cycle()
+
             await self.dp.start_polling(self.bot)
             logger.debug(f'Polling has ended')
         except TelegramNetworkError:
