@@ -2,6 +2,10 @@ name: Python application
 
 on: [push]
 
+env:
+  DOCKERHUB_PREFIX: "avkarcr"
+  PROJECT_NAME: "mexc_bot"
+
 jobs:
   tests:
     runs-on: ubuntu-latest
@@ -41,7 +45,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         push: true
-        tags: avkarcr/mexc_bot:latest
+        tags: ${{ env.DOCKERHUB_PREFIX }}/${{ env.PROJECT_NAME }}:latest
 
   deploy:
       runs-on: ubuntu-latest
@@ -54,8 +58,8 @@ jobs:
             username: ${{ secrets.CLOUD_USER }}
             key: ${{ secrets.CLOUD_SSH_KEY }}
             script: |
-              sudo docker stop avkarcr/mexc_bot || true
-              sudo docker rm avkarcr/mexc_bot || true
-              sudo docker pull avkarcr/mexc_bot:latest
-              sudo docker run -d -v ~/mexc_bot/db:/app/DB --name mexc_bot --env-file ~/mexc_bot/.env avkarcr/mexc_bot:latest
-              sudo docker image prune -a -f
+              sudo docker ps -a | grep ${{ env.PROJECT_NAME }} | grep -oE "^[0-9a-zA-Z]+" | xargs -r -I {} sh -c 'docker stop {} && docker rm {}'
+              sudo docker ps -a | grep ${{ env.PROJECT_NAME }} | grep -oE "^[0-9a-zA-Z]+" | xargs -r -I {} sh -c 'docker stop {} && docker rm {}'
+              sudo docker images | grep ${{ env.PROJECT_NAME }} | awk '{print $3}' | xargs -r docker rmi
+              sudo docker pull ${{ env.DOCKERHUB_PREFIX }}/${{ env.PROJECT_NAME }}:latest
+              sudo docker run -d -v ~/${{ env.PROJECT_NAME }}/db:/app/DB --name ${{ env.PROJECT_NAME }} --env-file ~/${{ env.PROJECT_NAME }}/.env ${{ env.DOCKERHUB_PREFIX }}/${{ env.PROJECT_NAME }}:latest

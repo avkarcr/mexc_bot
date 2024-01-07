@@ -74,11 +74,16 @@ class TeleBot():
         )
         logger.debug(f'FINISH {f_name}()')
 
-    async def start_trading_cycle(self):
-        now = dt.datetime.now()
-        while dt.datetime.now() < now + self.timing['spot']:
-            await self.bot.send_message(self.admin_id, text='Делаем что-то')
-            asyncio.sleep(self.timing['delay'])
+    async def start_cycle(self):  # todo вторым параметром лучше сделать корутину
+        end_of_cycle = dt.datetime.now() + dt.timedelta(seconds=self.timing['spot'])
+        while dt.datetime.now() < end_of_cycle:
+            await self.bot.send_message(self.admin_id, text='Делаем конвертацию')
+            result = await self.dp.mexc.convert_to_mx('NTD')
+            if result:
+                await self.bot.send_message(self.admin_id, text='Конвертация ОК')
+                return
+            await self.bot.send_message(self.admin_id, text='Не получилось, пробуем еще раз')
+            await asyncio.sleep(self.timing['delay'])
 
     async def edit_last_bot_msg(self):
         pass
@@ -92,8 +97,7 @@ class TeleBot():
         try:
             await self.bot.send_message(self.admin_id, text='Bot is working...')
 
-            await self.start_trading_cycle()
-            
+            await self.start_cycle()  # todo work
 
             await self.dp.start_polling(self.bot)
             logger.debug(f'Polling has ended')

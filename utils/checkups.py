@@ -18,7 +18,7 @@ async def get_environments() -> dict:
     result = (False, environ)
     for var_name, (env_name, _) in envs.items():
         environ[var_name] = os.getenv(env_name)
-        # if _ is list:
+        # if _ is list: # todo снять коменты и проверить на конфиге
         #     try:
         #         environ[var_name] = json.loads(environ[var_name].replace("'", '"'))
         #     except (json.JSONDecodeError, TypeError):
@@ -35,7 +35,7 @@ async def get_environments() -> dict:
     except (json.JSONDecodeError, TypeError):
         result = (True, f"Variable (config.py) TOKENS_ON_HOLD should be a list!")
     environ['MEXC_HOST'] = MEXC_HOST
-    environ['timing'] = TIMING
+    environ['timing'] = TIMING  # todo сделать так, чтобы переменные из конфига тоже проверялись
     return result
 
 def check_token(token_name):

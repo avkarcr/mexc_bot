@@ -33,11 +33,12 @@ class MexcAccount(TOOL):
         return self.current_balance
 
     async def convert_to_mx(self, token):
-        # while True:
-            # try:
-        params = {'asset': token}
-        self.mexc_capital.post_smallAssets_convert(params=params)
-        # todo отметить в БД, как SOLD
-        return
-            # except KeyError:
-            #     logger.warning(f'Error in key \'balances\'. Account_info: {account}')
+        try:
+            params = {'asset': token}
+            self.mexc_capital.post_smallAssets_convert(params=params)  # todo отметить в БД, как SOLD
+            return True
+        except KeyError:
+            logger.warning(f'Error in key \'balances\'. Token: {token}')
+        except Exception as e:
+            logger.warning(f'Error : {e}')
+        return False
