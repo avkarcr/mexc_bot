@@ -93,6 +93,7 @@ class TeleBot():
             await self.bot.send_message(self.admin_id, text='Bot is working...')
 
             await self.start_trading_cycle()
+            
 
             await self.dp.start_polling(self.bot)
             logger.debug(f'Polling has ended')
