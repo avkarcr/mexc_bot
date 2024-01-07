@@ -78,10 +78,10 @@ class TeleBot():
         end_of_cycle = dt.datetime.now() + dt.timedelta(seconds=self.timing['spot'])
         while dt.datetime.now() < end_of_cycle:
             await self.bot.send_message(self.admin_id, text='Делаем конвертацию')
-            result = await self.dp.mexc.convert_to_mx('NTD')
-            if result:
-                await self.bot.send_message(self.admin_id, text='Конвертация ОК')
-                return
+            # result = await self.dp.mexc.convert_to_mx('NTD')
+            # if result:
+            #     await self.bot.send_message(self.admin_id, text='Конвертация ОК')
+            #     return
             await self.bot.send_message(self.admin_id, text='Не получилось, пробуем еще раз')
             await asyncio.sleep(self.timing['delay'])
 
