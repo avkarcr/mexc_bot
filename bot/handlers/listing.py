@@ -1,3 +1,4 @@
+import datetime as dt
 from loguru import logger
 
 from aiogram import Router
@@ -32,8 +33,8 @@ async def command_listing_handler(message: Message) -> None:
     """
     This handler receives messages with `/listing` command
     """
-    mexc = listing_router.megabot.mexc
-    db = listing_router.megabot.db
+    megabot = listing_router.megabot
+    db = megabot.db
     args = message.text.split(maxsplit=1)
     if not check_args(args)[0]:
         await message.answer(check_args(args)[1])
@@ -41,10 +42,17 @@ async def command_listing_handler(message: Message) -> None:
     token = args[1].split(maxsplit=1)[0]
     listing_time = convert_listing_time(args[1].split(maxsplit=1)[1])
     await db.set_listing_time(token, listing_time)
-    # todo Сделать функцию по листингу внутри класса бота, а отсюда только message туда прокидывать
-    scheduler = AsyncIOScheduler({'apscheduler.timezone': 'Europe/Moscow'})  # todo working...
-    scheduler.add_job(mexc.convert_to_mx, 'date', run_date=listing_time, args=[token])
-    scheduler.start()
-    logger.debug(f'Convert MX for {token} has been scheduled at {listing_time}')
-
+    start_time = listing_time
+    if megabot.steps['spot']:
+        megabot.scheduler.add_job(megabot.step_1_spot_trade, 'date', run_date=start_time, args=[token])
+        logger.debug(f'Запланирована задача по продаже на споте {token} в {start_time}')
+        start_time += dt.timedelta(seconds=megabot.timing['spot'] + 1)
+    if megabot.steps['convert']:
+        megabot.scheduler.add_job(megabot.step_2_convert_to_mx, 'date', run_date=start_time, args=[token])
+        logger.debug(f'Запланирована задача по конвертации {token} в {start_time}')
+        start_time += dt.timedelta(seconds=megabot.timing['convert'] + 1)
+    if megabot.steps['spot']:
+        megabot.scheduler.add_job(megabot.step_3_threshold_meeting, 'date', run_date=listing_time, args=[token])
+        logger.debug(f'Запланирована задача по достижению минимального порога продажи {token} в {start_time}')
+    logger.debug(f'Trading cycle for {token} has been scheduled at {listing_time}')
     await message.answer(f'Set time for <b>{token}</b>\nListing time: {listing_time}.')

@@ -180,10 +180,9 @@ class DBHandler():
                 logging.debug(f'Scheduling task for token: {token}, listing: {listing}...')
                 self.megabot.schedule_task_in_time(
                     # coro=self.megabot.mexc.convert_to_mx,
-                    coro=self.megabot.bot.step_1_spot_trade,
+                    coro=self.step_1_spot_trade,
                     running_time=listing,
-                    kwargs={'asset': token},
-                    # kwargs={'token': token},
+                    kwargs={'token': token},
                 )
                 logging.debug(f'{token} scheduled successfully!')
             for item in result:

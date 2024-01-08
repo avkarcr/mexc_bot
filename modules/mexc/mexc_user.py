@@ -44,12 +44,9 @@ class MexcAccount(TOOL):
         try:
             params = {'asset': token}
             self.mexc_capital.post_smallAssets_convert(params=params)  # todo отметить в БД, как SOLD
-            return True
-        except KeyError:
-            logger.warning(f'Error in key \'balances\'. Token: {token}')
-        except Exception as e:
-            logger.warning(f'Error : {e}')
-        return False
+            return True  # todo вернуть детали транзакции
+        except:
+            raise MexcAPIException
 
     # async def schedule_mexc_task(self, running_time: dt, coro):
     #     while True:

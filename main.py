@@ -23,6 +23,7 @@ async def start():
         token=environ['token'],
         admin_id=environ['admin_id'],
         timing=environ['timing'],
+        steps=environ['steps'],
         db_set={
             'db_url': environ['db_url'],
             'drop_db_on_start': environ['drop_db_on_start'],

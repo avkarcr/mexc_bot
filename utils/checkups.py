@@ -19,6 +19,7 @@ async def get_environments() -> dict:
         'drop_db_on_start': ['DROP_DB_ON_START', bool, False],
         'timing': ['TIMING', dict, False],  # todo сделать проверку для словаря
         'tokens_on_hold': ['TOKENS_ON_HOLD', list, False],
+        'steps': ['STEPS', dict, False],
     }
     environ = {}  # todo сделать в этой функции нормальную проверку на пустые значения, а то был USER пустой и все падало
     result = (False, environ)

@@ -22,7 +22,7 @@ class ExtendedBot(Bot):
 
 
 class MegaBot:
-    def __init__(self, token, admin_id, timing, db_set, mexc_set):
+    def __init__(self, token, admin_id, timing, steps, db_set, mexc_set):
         self.db = DBHandler(db_set=db_set)
         self.db.set_megabot(self)
         self.bot = ExtendedBot(token=token, parse_mode=ParseMode.HTML)
@@ -38,6 +38,7 @@ class MegaBot:
 
         self.admin_id = admin_id
         self.timing = timing
+        self.steps = steps
         self.dp = Dispatcher()
         self.dp.include_routers(
             start_router,
@@ -90,7 +91,14 @@ class MegaBot:
         )
         logger.debug(f'FINISH {f_name}()')
 
-    async def start_cycle(self):  # todo вторым параметром лучше сделать корутину
+    async def start_cycle(self):
+        """
+        Эта функция запускает цикл продажи токена, который состоит из 3-х стадий:
+        1. Продажа токена на споте - в течение timing['spot'] секунд
+        2. Конвертация токена в MX - в течение timing['convert'] секунд
+        3. Минимальный порог транзакции (закупка на $6 и последующая полная продажа
+         актива) - в течение timing['threshold'] секунд
+        """
         end_of_cycle = dt.datetime.now() + dt.timedelta(seconds=self.timing['spot'])
         while dt.datetime.now() < end_of_cycle:
             await self.bot.send_message(self.admin_id, text='Делаем конвертацию')
@@ -107,17 +115,53 @@ class MegaBot:
     def schedule_task_in_time(self, coro, running_time: dt, **kwargs):
         self.scheduler.add_job(coro, 'date', run_date=running_time, kwargs=kwargs)
 
-    @async_retry(10)
-    async def step_1_spot_trade(self, token):  # todo доделать
+    async def step_1_spot_trade(self, token):  # todo переделать под продажу
         """
-        Эта функция в течение 10 сек. проверяет цену токена
-        если цена больше $5, то пытается продать токен на споте
-        если меньше, то ничего не делает.
-        Периодичность проверки - 1 секунда
-        Длительность в сек. задается в конфиге параметром TIMING['spot']
+        Эта функция проверяет цену токена. Если цена airdrop больше $5
+        то пытается продать токен на споте. Если меньше, то ничего не делает.
+        Периодичность проверки задается в TIMING['delay'].
+        Длительность попытки продажи задается в конфиге параметром TIMING['spot'].
         """
-        price = await self.mexc.mexc_market.get_price(params = {'asset': token})
-        await self.bot.send_message(self.admin_id, text=f'Проверяю цену. Цена токена {token}: {price} USDT')
+        stopTimestamp = dt.datetime.now() + dt.timedelta(seconds=self.timing['spot'])
+        await self.bot.send_message(self.admin_id, text=f'Starting spot trading for {token}')
+        while dt.datetime.now() < stopTimestamp:
+            try:
+                await self.mexc.convert_to_mx(token=token)
+                return True
+            except:
+                await asyncio.sleep(self.timing['delay'])
+        # price = await self.mexc.mexc_market.get_price(params = {'symbol': token})
+        # await self.bot.send_message(self.admin_id, text=f'Проверяю цену. Цена токена {token}: {price} USDT')
+
+    async def step_2_convert_to_mx(self, token):
+        """
+        Эта функция конвертирует токен в MX.
+        Периодичность проверки задается в TIMING['delay'].
+        Длительность попытки продажи задается в конфиге параметром TIMING['convert'].
+        """
+        stopTimestamp = dt.datetime.now() + dt.timedelta(seconds=self.timing['convert'])
+        await self.bot.send_message(self.admin_id, text=f'Converting token {token} to MX')
+        while dt.datetime.now() < stopTimestamp:
+            try:
+                await self.mexc.convert_to_mx(token=token)
+                await self.bot.send_message(
+                    self.admin_id,
+                    text=f'Токен {token} конвертирован в MX.'  # todo по курсу... детали!
+                )
+                return True
+            except:
+                await asyncio.sleep(self.timing['delay'])
+
+    async def step_3_threshold_meeting(self, token):
+        """
+        Эта функция закупает токен на $6 для обеспечения минимального
+        порога сделки на бирже.
+        После этого весь объем токена в кошельке продается по рыночной цене.
+        Процедура делается TIMING['threshold'] количество раз.
+        Если возникает ошибка на каждом этапе, то все прекращаем и
+        пишем пользователю, что токен нуждается в ручном управлении.
+        """
+        pass
 
     async def start(self) -> None:
         await self.create_db()
@@ -127,12 +171,12 @@ class MegaBot:
             minutes=self.timing['check'],
             misfire_grace_time=120
         )
-        self.scheduler.add_job(
-            self.db.schedule_sell_tokens,
-            'interval',
-            minutes=self.timing['check'],
-            misfire_grace_time=30
-        )
+        # self.scheduler.add_job(  # todo временно закомментил
+        #     self.db.schedule_sell_tokens,
+        #     'interval',
+        #     minutes=self.timing['check'],
+        #     misfire_grace_time=30
+        # )
         self.scheduler.start()
         try:
             await self.bot.send_message(self.admin_id, text='START running')
