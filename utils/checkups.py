@@ -14,7 +14,6 @@ async def get_environments() -> dict:
         'admin_id': ['ADMIN_ID', int, True],
         'mexc_api': ['MEXC_API', str, True],
         'mexc_secret_key': ['MEXC_SECRET_KEY', str, True],
-        'user': ['USER', str, True],
         'mexc_host': ['MEXC_HOST', str, False],
         'db_url': ['DB_URL', str, False],
         'drop_db_on_start': ['DROP_DB_ON_START', bool, False],
