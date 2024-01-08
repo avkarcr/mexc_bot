@@ -32,6 +32,9 @@ async def get_environments() -> dict:
             logger.debug(f'{var_name} is in config.py')
             environ[var_name] = getattr(config, env_name)
         logger.debug(f'Variable {var_name} is set. Now checking type...')
+        if var_name == 'tokens_on_hold':
+            value = environ['tokens_on_hold']
+            logger.debug(f'tokens_on_hold = {value}')
         if _type is int:
             try:
                 environ[var_name] = int(environ[var_name])
