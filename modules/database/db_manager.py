@@ -182,7 +182,8 @@ class DBHandler():
                     # coro=self.megabot.mexc.convert_to_mx,
                     coro=self.megabot.bot.step_1_spot_trade,
                     running_time=listing,
-                    kwargs={'token': token},
+                    kwargs={'asset': token},
+                    # kwargs={'token': token},
                 )
                 logging.debug(f'{token} scheduled successfully!')
             for item in result:
