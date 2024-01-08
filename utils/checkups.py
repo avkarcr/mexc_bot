@@ -39,9 +39,11 @@ async def get_environments() -> dict:
             try:
                 environ[var_name] = int(environ[var_name])
             except (ValueError, TypeError):
+                logger.debug(f'Before Exception on token {var_name}')
                 result = (True, f"Environment variable {environ[var_name]} should be an integer!")
         elif _type is not list:
             if not isinstance(environ[var_name], _type):
+                logger.debug(f'Before Exception on token {var_name}')
                 result = (True, f"Variable {environ[var_name]} should be a {_type} type.")
         else:
             pass  # todo нужен тест
