@@ -1,7 +1,7 @@
 DROP_DB_ON_START = True
 MEXC_HOST = 'https://api.mexc.com'
 DB_URL = 'sqlite:///DB/tokens.db'
-TOKENS_ON_HOLD = ['USDT', 'BNB', 'MX', 'MATH']  # todo проверять до операций торгов - можно менять!
+TOKENS_ON_HOLD = ['USDT', 'MX', 'MATH']  # todo проверять до операций торгов - можно менять!
 TIMING = {
     'price_check': 10,      # Время в сек. на анализ порога в $5
     'spot': 10,             # Время в сек. на торговлю

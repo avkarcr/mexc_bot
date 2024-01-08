@@ -116,7 +116,7 @@ class MegaBot:
         Периодичность проверки - 1 секунда
         Длительность в сек. задается в конфиге параметром TIMING['spot']
         """
-        price = await self.mexc.mexc_market(params = {'asset': token})
+        price = await self.mexc.mexc_market.get_price(params = {'asset': token})
         await self.bot.send_message(self.admin_id, text=f'Проверяю цену. Цена токена {token}: {price} USDT')
 
     async def start(self) -> None:
