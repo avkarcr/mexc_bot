@@ -2,15 +2,8 @@ import os
 import re
 import json
 import datetime as dt
-
+from loguru import logger
 import config
-from config import (
-    TIMING,
-    MEXC_HOST,
-    TOKENS_ON_HOLD,
-    DROP_DB_ON_START,
-    DB_URL,
-)
 
 from utils.exceptions import DateTimeParseException
 
@@ -31,10 +24,14 @@ async def get_environments() -> dict:
     environ = {}
     result = (False, environ)
     for var_name, (env_name, _type, _is_env) in envs.items():
+        logger.debug(f'Getting var {var_name} named {env_name} with type {_type}. Env? - {_is_env}')
         if _is_env:
+            logger.debug(f'{var_name} is in .env')
             environ[var_name] = os.getenv(env_name)
         else:
+            logger.debug(f'{var_name} is in config.py')
             environ[var_name] = getattr(config, env_name)
+        logger.debug(f'Variable {var_name} is set. Now checking type...')
         if _type is int:
             try:
                 environ[var_name] = int(environ[var_name])
