@@ -144,7 +144,7 @@ class DBHandler():
     async def get_tokens_by_status(self, status) -> list:
         """
         Функция забирает из БД токены с указанным статусом.
-        Возвращает список объектов
+        Возвращает список объектов таблицы TokenTable
         """
         logging.debug(f'Getting tokens with status {status} from DB')
         session = self.Session()
@@ -179,7 +179,8 @@ class DBHandler():
                 listing = item.trade_start_time
                 logging.debug(f'Scheduling task for token: {token}, listing: {listing}...')
                 self.megabot.schedule_task_in_time(
-                    coro=self.megabot.mexc.convert_to_mx,
+                    # coro=self.megabot.mexc.convert_to_mx,
+                    coro=self.megabot.bot.step_1_spot_trade,
                     running_time=listing,
                     kwargs={'token': token},
                 )

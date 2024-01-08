@@ -20,10 +20,10 @@ async def get_environments() -> dict:
         'timing': ['TIMING', dict, False],  # todo сделать проверку для словаря
         'tokens_on_hold': ['TOKENS_ON_HOLD', list, False],
     }
-    environ = {}
+    environ = {}  # todo сделать в этой функции нормальную проверку на пустые значения, а то был USER пустой и все падало
     result = (False, environ)
     for var_name, (env_name, _type, _is_env) in envs.items():
-        logger.debug(f'Getting var {var_name} named {env_name} with type {_type}. Env? - {_is_env}')
+        logger.debug(f'Getting var {var_name} named {env_name} with type {_type}, is env = {_is_env}')
         if _is_env:
             logger.debug(f'{var_name} is in .env')
             environ[var_name] = os.getenv(env_name)
@@ -67,7 +67,7 @@ def check_listing_time(listing_time):
     pattern = r'^(?:(?:\d{2}\.\d{2}(?:\.\d{4})?)\s)?\d{2}:\d{2}(?::\d{2})?$'
     return bool(re.match(pattern, listing_time))
 
-def check_date_with_year(datestr):
+def check_date_with_year(datestr):  # todo добавить автоматическую подстановку сегодняшней даты или завтрашней, если время вышло уже сегодня
     date_with_year = r'\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}'
     date_without_year = r'\d{2}\.\d{2} \d{2}:\d{2}'
     if re.match(date_with_year, datestr):

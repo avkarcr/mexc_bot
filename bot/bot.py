@@ -13,6 +13,7 @@ from bot.handlers.start import start_router
 from bot.handlers.listing import listing_router  # todo сделать в одном handler
 from modules.database.db_manager import DBHandler
 from modules.mexc.mexc_user import MexcAccount
+from utils.decorators import async_retry
 
 
 class ExtendedBot(Bot):
@@ -101,10 +102,22 @@ class MegaBot:
             await asyncio.sleep(self.timing['delay'])
 
     async def edit_last_bot_msg(self):
-        pass
+        pass  # todo сделать
 
     def schedule_task_in_time(self, coro, running_time: dt, **kwargs):
         self.scheduler.add_job(coro, 'date', run_date=running_time, kwargs=kwargs)
+
+    @async_retry(10)
+    def step_1_spot_trade(self, token):  # todo доделать
+        """
+        Эта функция в течение 10 сек. проверяет цену токена
+        если цена больше $5, то пытается продать токен на споте
+        если меньше, то ничего не делает.
+        Периодичность проверки - 1 секунда
+        Длительность в сек. задается в конфиге параметром TIMING['spot']
+        """
+        price = await self.mexc.mexc_market(params = {'asset': token})
+        await self.bot.send_message(self.admin_id, text=f'Проверяю цену. Цена токена {token}: {price} USDT')
 
     async def start(self) -> None:
         await self.create_db()
