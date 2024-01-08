@@ -126,12 +126,30 @@ class MegaBot:
         await self.bot.send_message(self.admin_id, text=f'Starting spot trading for {token}')
         while dt.datetime.now() < stopTimestamp:
             try:
-                await self.mexc.convert_to_mx(token=token)
+                price = await self.mexc.mexc_market.get_price(params={'symbol': token + 'USDT'})
+                price = float(price['price'])
+                await self.bot.send_message(self.admin_id, text=f'Проверяю цену. Цена токена {token}: {price} USDT')
+                price_is_ok = (price >= 5)
+                if price_is_ok:
+                    logger.debug(f'Начинаем продажу токена {token}')
+                    balance = await self.mexc.get_balance()
+                    qty = next((item['free'] for item in balance if item['asset'] == token), None)
+                    params = {
+                        'symbol': token + 'USDT',
+                        'side': 'SELL',
+                        'type': 'MARKET',
+                        'quoteOrderQty': qty,
+                        'quantity': qty,
+                    }
+                    self.mexc.mexc_trade.post_order(params)
+                    await self.bot.send_message(self.admin_id, text=f'Продано {qty} {token}')
+                else:
+                    await self.bot.send_message(self.admin_id, text='Цена ниже $5. Ждем...')
+                    await asyncio.sleep(self.timing['delay'])
+                    continue
                 return True
             except:
                 await asyncio.sleep(self.timing['delay'])
-        # price = await self.mexc.mexc_market.get_price(params = {'symbol': token})
-        # await self.bot.send_message(self.admin_id, text=f'Проверяю цену. Цена токена {token}: {price} USDT')
 
     async def step_2_convert_to_mx(self, token):
         """
@@ -146,7 +164,7 @@ class MegaBot:
                 await self.mexc.convert_to_mx(token=token)
                 await self.bot.send_message(
                     self.admin_id,
-                    text=f'Токен {token} конвертирован в MX.'  # todo по курсу... детали!
+                    text=f'Токен {token} конвертирован в MX. Но это не точно...'  # todo по курсу... детали!
                 )
                 return True
             except:
