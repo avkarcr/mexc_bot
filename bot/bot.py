@@ -108,7 +108,7 @@ class MegaBot:
         self.scheduler.add_job(coro, 'date', run_date=running_time, kwargs=kwargs)
 
     @async_retry(10)
-    def step_1_spot_trade(self, token):  # todo доделать
+    async def step_1_spot_trade(self, token):  # todo доделать
         """
         Эта функция в течение 10 сек. проверяет цену токена
         если цена больше $5, то пытается продать токен на споте
