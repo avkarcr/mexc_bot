@@ -3,7 +3,7 @@ MEXC_HOST = 'https://api.mexc.com'
 DB_URL = 'sqlite:///DB/tokens.db'
 TOKENS_ON_HOLD = ['USDT', 'MX', 'MATH']  # todo проверять до операций торгов - можно менять!
 STEPS = {
-    'spot': False,
+    'spot': True,
     'convert': True,
     'threshold': False,
 }

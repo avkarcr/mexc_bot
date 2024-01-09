@@ -141,10 +141,16 @@ class MegaBot:
                         'quoteOrderQty': qty,
                         'quantity': qty,
                     }
-                    self.mexc.mexc_trade.post_order(params)
-                    await self.bot.send_message(self.admin_id, text=f'Продано {qty} {token}')
+                    resp = self.mexc.mexc_trade.post_order(params)
+                    await self.bot.send_message(self.admin_id, text={resp})
+                    await self.bot.send_message(self.admin_id, text={resp['msg']})
+                    if resp['status'] != 200:
+                        logger.error(f'{token} {qty} has not been sold')
+                        await self.bot.send_message(self.admin_id, text=f'{token} {qty} has not been sold')
+                        continue
+                    await self.bot.send_message(self.admin_id, text=f'Sold {qty} {token}')
                 else:
-                    await self.bot.send_message(self.admin_id, text='Цена ниже $5. Ждем...')
+                    await self.bot.send_message(self.admin_id, text='Minimum threshold $5 has not been met. Waiting...')
                     await asyncio.sleep(self.timing['delay'])
                     continue
                 return True
