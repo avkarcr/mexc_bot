@@ -59,6 +59,9 @@ class MexcAccount(TOOL):
 
     async def get_tokens_to_convert_mx(self):
         tokens_to_convert = await self.mexc_capital.get_smallAssets_list()
+        msg = ''
+        for token_to_convert in tokens_to_convert:
+            msg += token_to_convert['asset']
         if tokens_to_convert['status'] == 200:
             tokens = tokens_to_convert['text']
             await self.megabot.bot.send_message(self.megabot.admin_id, text=f'Доступно для конвертации: {tokens}')

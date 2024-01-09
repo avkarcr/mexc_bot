@@ -65,7 +65,7 @@ class mexc_market(TOOL):
         response = self.public_request(self.method, url)
         return response.json()
 
-    def get_exchangeInfo(self, params=None):
+    async def get_exchangeInfo(self, params=None):
         """get exchangeInfo"""
         url = '{}{}'.format(self.api, '/exchangeInfo')
         response = self.public_request(self.method, url, params=params)
@@ -149,7 +149,7 @@ class mexc_trade(TOOL):
         response = self.sign_request(method, url, params=params)
         return response.json()
 
-    def post_order(self, params):
+    async def post_order(self, params):
         """place order"""
         method = 'POST'
         url = '{}{}'.format(self.api, '/order')

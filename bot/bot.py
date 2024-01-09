@@ -115,6 +115,9 @@ class MegaBot:
     def schedule_task_in_time(self, coro, running_time: dt, **kwargs):
         self.scheduler.add_job(coro, 'date', run_date=running_time, kwargs=kwargs)
 
+    def schedule_task_regular(self, coro, running_time: dt, **kwargs):
+        self.scheduler.add_job(coro, 'interval', run_date=running_time, kwargs=kwargs)
+
     async def step_1_spot_trade(self, token):  # todo переделать под продажу
         """
         Эта функция проверяет цену токена. Если цена airdrop больше $5
@@ -127,25 +130,27 @@ class MegaBot:
         while dt.datetime.now() < stopTimestamp:
             try:
                 symbol = token + 'USDT'
-                if not self.mexc.is_symbol_api_available(symbol):
+                # symbol = token + 'USDC'
+                params = {'symbol': symbol}
+                exchangeinfo = await self.mexc.mexc_market.get_exchangeInfo(params=params)
+                if not await self.mexc.is_symbol_api_available(symbol):
                     logger.debug(f'Пара {symbol} недоступна для продажи через API')
                     await self.bot.send_message(self.admin_id, text=f'Пара {symbol} недоступна для продажи через API')
                     return False
                 price = await self.mexc.mexc_market.get_price(params={'symbol': symbol})
                 balance = await self.mexc.get_balance()
                 qty = next((item['free'] for item in balance if item['asset'] == token), None)
-                price_is_ok = (float(price['price'] * int(qty)) >= 5)
+                price_is_ok = (float(price['price']) * float(qty)) >= 5
                 if price_is_ok:
                     logger.debug(f'Начинаем продажу токена {token}')
                     params = {
-                        'symbol': token + 'USDT',
+                        'symbol': symbol,
                         'side': 'SELL',
                         'type': 'MARKET',
-                        # 'quoteOrderQty': qty,
                         'quantity': qty,
                     }
                     logger.debug(f'Параметры: {params}')
-                    resp = self.mexc.mexc_trade.post_order(params)
+                    resp = await self.mexc.mexc_trade.post_order(params)
                     logger.debug(f'Resp: {resp}')
                     await self.bot.send_message(self.admin_id, text=f'{resp}')
                     # await self.bot.send_message(self.admin_id, text={resp['msg']})
@@ -201,23 +206,6 @@ class MegaBot:
             minutes=self.timing['check'],
             misfire_grace_time=120
         )
-        self.scheduler.add_job(  # todo убрать - временный тест
-            self.mexc.is_symbol_api_available,
-            'interval',
-            minutes=10,
-            args=['APEXUSDT']
-        )
-        self.scheduler.add_job(  # todo убрать - временный тест
-            self.mexc.get_tokens_to_convert_mx,
-            'interval',
-            minutes=2,
-        )
-        # self.scheduler.add_job(  # todo временно закомментил
-        #     self.db.schedule_sell_tokens,
-        #     'interval',
-        #     minutes=self.timing['check'],
-        #     misfire_grace_time=30
-        # )
         self.scheduler.start()
         try:
             await self.bot.send_message(self.admin_id, text='START running')

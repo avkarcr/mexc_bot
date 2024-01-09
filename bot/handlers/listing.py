@@ -45,14 +45,14 @@ async def command_listing_handler(message: Message) -> None:
     start_time = listing_time
     if megabot.steps['spot']:
         megabot.scheduler.add_job(megabot.step_1_spot_trade, 'date', run_date=start_time, args=[token])
-        logger.debug(f'Запланирована задача по продаже на споте {token} в {start_time}')
+        logger.debug(f'Scheduled SPOT for {token}')
         start_time += dt.timedelta(seconds=megabot.timing['spot'] + 1)
     if megabot.steps['convert']:
         megabot.scheduler.add_job(megabot.step_2_convert_to_mx, 'date', run_date=start_time, args=[token])
-        logger.debug(f'Запланирована задача по конвертации {token} в {start_time}')
+        logger.debug(f'Scheduled CONVERT for {token}')
         start_time += dt.timedelta(seconds=megabot.timing['convert'] + 1)
     if megabot.steps['spot']:
         megabot.scheduler.add_job(megabot.step_3_threshold_meeting, 'date', run_date=listing_time, args=[token])
-        logger.debug(f'Запланирована задача по достижению минимального порога продажи {token} в {start_time}')
+        logger.debug(f'Scheduled THRESHOLD for {token}')
     logger.debug(f'Trading cycle for {token} has been scheduled at {listing_time}')
     await message.answer(f'Set time for <b>{token}</b>\nListing time: {listing_time}.')
