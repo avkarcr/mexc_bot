@@ -126,7 +126,8 @@ class MegaBot:
         await self.bot.send_message(self.admin_id, text=f'Starting spot trading for {token}')
         while dt.datetime.now() < stopTimestamp:
             try:
-                price = await self.mexc.mexc_market.get_price(params={'symbol': token + 'USDT'})
+                symbol = token + 'USDT'
+                price = await self.mexc.mexc_market.get_price(params={'symbol': symbol})
                 price = float(price['price'])
                 await self.bot.send_message(self.admin_id, text=f'Проверяю цену. Цена токена {token}: {price} USDT')
                 price_is_ok = (price >= 5)
@@ -135,12 +136,13 @@ class MegaBot:
                     balance = await self.mexc.get_balance()
                     logger.debug(f'Баланс: {balance}')
                     qty = next((item['free'] for item in balance if item['asset'] == token), None)
+                    logger.debug(f'Symbol: {symbol}')
                     logger.debug(f'Qty: {qty}')
                     params = {
                         'symbol': token + 'USDT',
                         'side': 'SELL',
                         'type': 'MARKET',
-                        'quoteOrderQty': qty,
+                        # 'quoteOrderQty': qty,
                         'quantity': qty,
                     }
                     logger.debug(f'Параметры: {params}')
