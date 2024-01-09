@@ -207,6 +207,11 @@ class MegaBot:
             minutes=10,
             args=['APEXUSDT']
         )
+        self.scheduler.add_job(  # todo убрать - временный тест
+            self.mexc.get_tokens_to_convert_mx,
+            'interval',
+            minutes=2,
+        )
         # self.scheduler.add_job(  # todo временно закомментил
         #     self.db.schedule_sell_tokens,
         #     'interval',

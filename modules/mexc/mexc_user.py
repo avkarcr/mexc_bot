@@ -56,3 +56,10 @@ class MexcAccount(TOOL):
             await self.megabot.bot.send_message(self.megabot.admin_id, text=f'Символ {symbol} стал доступен!')
             return True
         return False
+
+    async def get_tokens_to_convert_mx(self):
+        tokens_to_convert = await self.mexc_capital.get_smallAssets_list()
+        if tokens_to_convert:
+            await self.megabot.bot.send_message(self.megabot.admin_id, text=f'Доступно для конвертации: {tokens_to_convert}')
+            return True
+        return False
