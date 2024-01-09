@@ -206,6 +206,12 @@ class MegaBot:
             minutes=self.timing['check'],
             misfire_grace_time=120
         )
+        self.scheduler.add_job(  # todo убрать - временный тест
+            self.mexc.is_symbol_api_available,
+            'interval',
+            minutes=10,
+            args=['APEXUSDT']
+        )
         self.scheduler.start()
         try:
             await self.bot.send_message(self.admin_id, text='START running')
