@@ -59,7 +59,7 @@ class mexc_market(TOOL):
         response = self.public_request(self.method, url)
         return response.json()
 
-    def get_defaultSymbols(self):
+    async def get_defaultSymbols(self):
         """get defaultSymbols"""
         url = '{}{}'.format(self.api, '/defaultSymbols')
         response = self.public_request(self.method, url)

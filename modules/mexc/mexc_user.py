@@ -48,10 +48,12 @@ class MexcAccount(TOOL):
         except:
             raise MexcAPIException
 
-    # async def schedule_mexc_task(self, running_time: dt, coro):
-    #     while True:
-    #         current_time = dt.datetime.now()
-    #         if current_time >= running_time:
-    #             await coro()
-    #             return
-    #         await asyncio.sleep(60)
+    async def is_symbol_api_available(self, symbol):
+        available_symbols = await self.mexc_market.get_defaultSymbols()
+        # return symbol in available_symbols['data']
+        result = symbol in available_symbols['data']
+        if result:
+            await self.megabot.bot.send_message(self.megabot.admin_id, text=f'Символ {symbol} появился')
+        else:
+            await self.megabot.bot.send_message(self.megabot.admin_id, text=f'Символа {symbol} пока нет в списке доступных')
+        return

@@ -127,10 +127,13 @@ class MegaBot:
         while dt.datetime.now() < stopTimestamp:
             try:
                 symbol = token + 'USDT'
+                availableSymbols = await self.mexc.mexc_market.get_defaultSymbols()
+                is_api_available = False  # todo сделать запрос к defaultSymbols
+                if not is_api_available:
+                    await self.bot.send_message(self.admin_id, text=f'Пара {symbol} недоступна для торговли через API')
+                    return False  # todo написать сообщение
                 price = await self.mexc.mexc_market.get_price(params={'symbol': symbol})
-                price = float(price['price'])
-                await self.bot.send_message(self.admin_id, text=f'Проверяю цену. Цена токена {token}: {price} USDT')
-                price_is_ok = (price >= 5)
+                price_is_ok = (float(price['price']) >= 5)
                 if price_is_ok:
                     logger.debug(f'Начинаем продажу токена {token}')
                     balance = await self.mexc.get_balance()
@@ -200,6 +203,18 @@ class MegaBot:
             'interval',
             minutes=self.timing['check'],
             misfire_grace_time=120
+        )
+        self.scheduler.add_job(
+            self.mexc.is_symbol_api_available,
+            'interval',
+            minutes=1,
+            args=['AVAXUSDT']
+        )
+        self.scheduler.add_job(
+            self.mexc.is_symbol_api_available,
+            'interval',
+            minutes=2,
+            args=['AVAXUSDC']
         )
         # self.scheduler.add_job(  # todo временно закомментил
         #     self.db.schedule_sell_tokens,
