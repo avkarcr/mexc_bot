@@ -127,20 +127,16 @@ class MegaBot:
         while dt.datetime.now() < stopTimestamp:
             try:
                 symbol = token + 'USDT'
-                availableSymbols = await self.mexc.mexc_market.get_defaultSymbols()
-                is_api_available = False  # todo сделать запрос к defaultSymbols
-                if not is_api_available:
-                    await self.bot.send_message(self.admin_id, text=f'Пара {symbol} недоступна для торговли через API')
-                    return False  # todo написать сообщение
+                if not self.mexc.is_symbol_api_available(symbol):
+                    logger.debug(f'Пара {symbol} недоступна для продажи через API')
+                    await self.bot.send_message(self.admin_id, text=f'Пара {symbol} недоступна для продажи через API')
+                    return False
                 price = await self.mexc.mexc_market.get_price(params={'symbol': symbol})
-                price_is_ok = (float(price['price']) >= 5)
+                balance = await self.mexc.get_balance()
+                qty = next((item['free'] for item in balance if item['asset'] == token), None)
+                price_is_ok = (float(price['price'] * int(qty)) >= 5)
                 if price_is_ok:
                     logger.debug(f'Начинаем продажу токена {token}')
-                    balance = await self.mexc.get_balance()
-                    logger.debug(f'Баланс: {balance}')
-                    qty = next((item['free'] for item in balance if item['asset'] == token), None)
-                    logger.debug(f'Symbol: {symbol}')
-                    logger.debug(f'Qty: {qty}')
                     params = {
                         'symbol': token + 'USDT',
                         'side': 'SELL',
@@ -176,10 +172,11 @@ class MegaBot:
         await self.bot.send_message(self.admin_id, text=f'Converting token {token} to MX')
         while dt.datetime.now() < stopTimestamp:
             try:
-                await self.mexc.convert_to_mx(token=token)
+                result = await self.mexc.convert_to_mx(token=token)
+                logger.debug(f'Convert {token} to MX RESULT: {result}')
                 await self.bot.send_message(
                     self.admin_id,
-                    text=f'Токен {token} конвертирован в MX. Но это не точно...'  # todo по курсу... детали!
+                    text=f'Результат конвертации {token} в MX: {result}'  # todo по курсу... детали!
                 )
                 return True
             except:
@@ -204,7 +201,7 @@ class MegaBot:
             minutes=self.timing['check'],
             misfire_grace_time=120
         )
-        self.scheduler.add_job(
+        self.scheduler.add_job(  # todo убрать - временный тест
             self.mexc.is_symbol_api_available,
             'interval',
             minutes=10,

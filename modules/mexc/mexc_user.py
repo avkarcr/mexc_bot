@@ -54,4 +54,5 @@ class MexcAccount(TOOL):
         result = symbol in available_symbols['data']
         if result:
             await self.megabot.bot.send_message(self.megabot.admin_id, text=f'Символ {symbol} стал доступен!')
-        return
+            return True
+        return False
