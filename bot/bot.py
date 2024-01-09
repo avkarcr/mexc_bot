@@ -208,13 +208,7 @@ class MegaBot:
             self.mexc.is_symbol_api_available,
             'interval',
             minutes=1,
-            args=['AVAXUSDT']
-        )
-        self.scheduler.add_job(
-            self.mexc.is_symbol_api_available,
-            'interval',
-            minutes=2,
-            args=['AVAXUSDC']
+            args=['APEXUSDT']
         )
         # self.scheduler.add_job(  # todo временно закомментил
         #     self.db.schedule_sell_tokens,

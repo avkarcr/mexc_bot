@@ -53,7 +53,5 @@ class MexcAccount(TOOL):
         # return symbol in available_symbols['data']
         result = symbol in available_symbols['data']
         if result:
-            await self.megabot.bot.send_message(self.megabot.admin_id, text=f'Символ {symbol} появился')
-        else:
-            await self.megabot.bot.send_message(self.megabot.admin_id, text=f'Символа {symbol} пока нет в списке доступных')
+            await self.megabot.bot.send_message(self.megabot.admin_id, text=f'Символ {symbol} стал доступен!')
         return
