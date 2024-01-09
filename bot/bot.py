@@ -133,7 +133,9 @@ class MegaBot:
                 if price_is_ok:
                     logger.debug(f'Начинаем продажу токена {token}')
                     balance = await self.mexc.get_balance()
+                    logger.debug(f'Баланс: {balance}')
                     qty = next((item['free'] for item in balance if item['asset'] == token), None)
+                    logger.debug(f'Qty: {qty}')
                     params = {
                         'symbol': token + 'USDT',
                         'side': 'SELL',
@@ -141,9 +143,11 @@ class MegaBot:
                         'quoteOrderQty': qty,
                         'quantity': qty,
                     }
+                    logger.debug(f'Начинаем: {qty}')
                     resp = self.mexc.mexc_trade.post_order(params)
-                    await self.bot.send_message(self.admin_id, text={resp})
-                    await self.bot.send_message(self.admin_id, text={resp['msg']})
+                    logger.debug(f'Resp: {resp}')
+                    await self.bot.send_message(self.admin_id, text=f'{resp}')
+                    # await self.bot.send_message(self.admin_id, text={resp['msg']})
                     if resp['status'] != 200:
                         logger.error(f'{token} {qty} has not been sold')
                         await self.bot.send_message(self.admin_id, text=f'{token} {qty} has not been sold')
