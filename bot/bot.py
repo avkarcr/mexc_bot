@@ -207,7 +207,7 @@ class MegaBot:
         self.scheduler.add_job(
             self.mexc.is_symbol_api_available,
             'interval',
-            minutes=1,
+            minutes=10,
             args=['APEXUSDT']
         )
         # self.scheduler.add_job(  # todo временно закомментил
