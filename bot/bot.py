@@ -143,7 +143,7 @@ class MegaBot:
                         'quoteOrderQty': qty,
                         'quantity': qty,
                     }
-                    logger.debug(f'Начинаем: {qty}')
+                    logger.debug(f'Параметры: {params}')
                     resp = self.mexc.mexc_trade.post_order(params)
                     logger.debug(f'Resp: {resp}')
                     await self.bot.send_message(self.admin_id, text=f'{resp}')
