@@ -353,7 +353,7 @@ class mexc_capital(TOOL):
         response = self.sign_request(method, url, params=params)
         return response.json()
 
-    def get_smallAssets_list(self):
+    async def get_smallAssets_list(self):
         """small Assets convertible list"""
         method = 'GET'
         url = '{}{}'.format(self.api, '/convert/list')
